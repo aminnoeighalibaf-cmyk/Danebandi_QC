@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ثبت آزمایش QC</title>
+<style>
+  :root{
+    --ink:#1b1f24;
+    --paper:#eef0ee;
+    --line:#d7d9d3;
+    --accent:#b5651d;
+    --accent-dark:#1b1f24;
+    --warn:#a5462c;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Vazirmatn','Tahoma',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    padding-bottom:100px;
+  }
+  header{
+    background:var(--accent-dark);
+    color:#fff;
+    padding:20px 16px 24px;
+    border-bottom:4px solid var(--accent);
+    position:relative;
+    overflow:hidden;
+  }
+  header .brand-row{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    position:relative;
+    z-index:1;
+  }
+  header .brand-row .company{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.5px;
+  }
+  header .brand-row .divider{
+    width:1px;height:16px;background:rgba(255,255,255,.35);
+  }
+  header .brand-row .company-sub{
+    font-size:12px;
+    opacity:.75;
+  }
+  header h1{margin:8px 0 0;font-size:17px;font-weight:700;position:relative;z-index:1;}
+  header p{margin:4px 0 0;font-size:12px;opacity:.75;position:relative;z-index:1;}
+  header::after{
+    content:"";
+    position:absolute;
+    left:-20px; top:-20px;
+    width:140px;height:140px;
+    background:
+      radial-gradient(circle at 20% 30%, var(--accent) 0 3px, transparent 3px),
+      radial-gradient(circle at 60% 60%, var(--accent) 0 2px, transparent 2px),
+      radial-gradient(circle at 80% 20%, var(--accent) 0 4px, transparent 4px),
+      radial-gradient(circle at 40% 80%, var(--accent) 0 2px, transparent 2px);
+    opacity:.25;
+  }
+
+  main{padding:14px;max-width:520px;margin:0 auto;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:12px;
+  }
+  .card h2{
+    font-size:14px;
+    margin:0 0 10px;
+    color:var(--accent-dark);
+    border-bottom:1px solid var(--line);
+    padding-bottom:8px;
+  }
+
+  label{
+    display:block;
+    font-size:12.5px;
+    color:#555;
+    margin:8px 0 3px;
+  }
+  input[type=text], input[type=number], select{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:14px;
+    background:#fff;
+    font-family:inherit;
+  }
+  input:focus, select:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .toggle-list{display:flex;flex-direction:column;gap:8px;}
+  .toggle-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#faf8f3;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .toggle-item input{width:18px;height:18px;flex-shrink:0;}
+  .toggle-item span{font-size:13.5px;}
+
+  .section{
+    display:none;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--line);
+  }
+  .section.open{display:block;}
+  .section .subtitle{
+    font-size:11.5px;
+    color:#888;
+    margin-bottom:6px;
+  }
+
+  .submit-bar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:#fff;
+    border-top:1px solid var(--line);
+    padding:12px 14px;
+    display:flex;
+    gap:10px;
+  }
+  button{
+    flex:1;
+    padding:13px;
+    border:none;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  #submitBtn{background:var(--accent);color:#fff;}
+  #submitBtn:active{background:var(--accent-dark);}
+  #submitBtn:disabled{background:#aaa;}
+
+  .msg{
+    margin:10px 0;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:13px;
+    display:none;
+  }
+  .msg.ok{background:#e4f2e9;color:var(--accent-dark);display:block;}
+  .msg.err{background:#f6e3dd;color:var(--warn);display:block;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-row">
+    <span class="company">پیکر</span>
+    <span class="divider"></span>
+    <span class="company-sub">شرکت ساختمانی</span>
+  </div>
+  <h1>واحد کنترل کیفیت — آزمایشگاه دانه‌بندی مصالح</h1>
+  <p>فرم ثبت آزمایش روزانه</p>
+</header>
+
+<main>
+  <div id="msgBox" class="msg"></div>
+
+  <form id="qcForm">
+
+    <!-- اطلاعات هدر -->
+    <div class="card">
+      <h2>اطلاعات کلی</h2>
+
+      <label>نام کارمند</label>
+      <input type="text" id="entered_by" required>
+
+      <label>نوع سنگدانه</label>
+      <select id="aggregate_type" required>
+        <option value="">— انتخاب کنید —</option>
+        <option value="ماسه شسته">ماسه شسته</option>
+        <option value="ماسه شکسته">ماسه شکسته</option>
+        <option value="نخودی" disabled>نخودی (به‌زودی)</option>
+      </select>
+
+      <div class="row2">
+        <div>
+          <label>شماره نمونه</label>
+          <input type="text" id="sample_number">
+        </div>
+        <div>
+          <label>تاریخ نمونه‌گیری</label>
+          <input type="text" id="sample_date_fa" placeholder="1405.06.10" required>
+        </div>
+      </div>
+
+      <label>نام پروژه</label>
+      <input type="text" id="project_name">
+
+      <label>نام آزمون‌کننده</label>
+      <input type="text" id="tester_name">
+    </div>
+
+    <!-- انتخاب آزمایش‌های انجام‌شده -->
+    <div class="card">
+      <h2>آزمایش‌های امروز کدام‌اند؟</h2>
+      <div class="toggle-list">
+        <label class="toggle-item">
+          <input type="checkbox" id="chk_sieve" checked>
+          <span>دانه‌بندی (سرندی)</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="chk_moisture" checked>
+          <span>رطوبت</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="chk_se">
+          <span>ارزش ماسه‌ای (SE)</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="chk_sg">
+          <span>وزن مخصوص و جذب آب</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="chk_uw">
+          <span>وزن واحد حجم</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="chk_voids">
+          <span>فضای خالی سنگدانه ریز</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- دانه‌بندی -->
+    <div class="card section" id="sec_sieve">
+      <h2>دانه‌بندی</h2>
+      <div class="subtitle">جدول اول — پیش‌آزمون درشت‌دانه (وزن مانده، گرم)</div>
+      <div class="row2">
+        <div><label>الک 3/8 (C9)</label><input type="number" step="any" id="c9"></div>
+        <div><label>الک 4 (C10)</label><input type="number" step="any" id="c10"></div>
+      </div>
+      <div class="row2">
+        <div><label>الک 8 (C11)</label><input type="number" step="any" id="c11"></div>
+        <div><label>رده شده (C12)</label><input type="number" step="any" id="c12"></div>
+      </div>
+
+      <div class="subtitle" style="margin-top:14px;">جدول دوم — دانه‌بندی استاندارد ریزدانه (وزن مانده، گرم)</div>
+      <div class="row2">
+        <div><label>الک 3/8 (C16)</label><input type="number" step="any" id="c16"></div>
+        <div><label>الک 4 (C17)</label><input type="number" step="any" id="c17"></div>
+      </div>
+      <div class="row2">
+        <div><label>الک 8 (C18)</label><input type="number" step="any" id="c18"></div>
+        <div><label>الک 16 (C19)</label><input type="number" step="any" id="c19"></div>
+      </div>
+      <div class="row2">
+        <div><label>الک 30 (C20)</label><input type="number" step="any" id="c20"></div>
+        <div><label>الک 50 (C21)</label><input type="number" step="any" id="c21"></div>
+      </div>
+      <div class="row2">
+        <div><label>الک 100 (C22)</label><input type="number" step="any" id="c22"></div>
+        <div><label>الک 200</label><input type="number" step="any" id="sieve200"></div>
+      </div>
+      <div class="subtitle" style="margin-top:4px;color:var(--warn);">
+        ⚠️ مقدار الک ۲۰۰ فعلاً فقط ذخیره می‌شود؛ محل دقیق آن در فایل اکسل هنوز با آزمایشگاه نهایی نشده است.
+      </div>
+    </div>
+
+    <!-- رطوبت -->
+    <div class="card section" id="sec_moisture">
+      <h2>رطوبت</h2>
+      <div class="row2">
+        <div><label>وزن خشک اولیه (C26)</label><input type="number" step="any" id="c26"></div>
+        <div><label>خشک بعد از شست‌وشو (C27)</label><input type="number" step="any" id="c27"></div>
+      </div>
+    </div>
+
+    <!-- SE -->
+    <div class="card section" id="sec_se">
+      <h2>ارزش ماسه‌ای (SE)</h2>
+      <div class="row2">
+        <div><label>قرائت ماسه - بدون ویبره (H10)</label><input type="number" step="any" id="h10"></div>
+        <div><label>قرائت ماسه - با ویبره (I10)</label><input type="number" step="any" id="i10"></div>
+      </div>
+      <div class="row2">
+        <div><label>قرائت رس کل - بدون ویبره (H11)</label><input type="number" step="any" id="h11"></div>
+        <div><label>قرائت رس کل - با ویبره (I11)</label><input type="number" step="any" id="i11"></div>
+      </div>
+    </div>
+
+    <!-- وزن مخصوص -->
+    <div class="card section" id="sec_sg">
+      <h2>وزن مخصوص و جذب آب</h2>
+      <div class="row2">
+        <div><label>وزن ماسه خشک در اون - gr (L3)</label><input type="number" step="any" id="l3"></div>
+        <div><label>جرم پیکنومتر+آب - gr (L4)</label><input type="number" step="any" id="l4"></div>
+      </div>
+      <div class="row2">
+        <div><label>جرم ماسه در پیکنومتر - gr (L5)</label><input type="number" step="any" id="l5"></div>
+        <div><label>جرم پیکنومتر+آب+ماسه - gr (L6)</label><input type="number" step="any" id="l6"></div>
+      </div>
+    </div>
+
+    <!-- وزن واحد حجم -->
+    <div class="card section" id="sec_uw">
+      <h2>وزن واحد حجم</h2>
+      <div class="row2">
+        <div><label>وزن ظرف+نمونه - بدون ویبره (H4)</label><input type="number" step="any" id="h4"></div>
+        <div><label>وزن ظرف+نمونه - با ویبره (I4)</label><input type="number" step="any" id="i4"></div>
+      </div>
+      <div class="row2">
+        <div><label>وزن ظرف - بدون ویبره (H5)</label><input type="number" step="any" id="h5"></div>
+        <div><label>وزن ظرف - با ویبره (I5)</label><input type="number" step="any" id="i5"></div>
+      </div>
+      <div class="row2">
+        <div><label>حجم ظرف - بدون ویبره Cm3 (H7)</label><input type="number" step="any" id="h7"></div>
+        <div><label>حجم ظرف - با ویبره Cm3 (I7)</label><input type="number" step="any" id="i7"></div>
+      </div>
+    </div>
+
+    <!-- فضای خالی -->
+    <div class="card section" id="sec_voids">
+      <h2>فضای خالی سنگدانه ریز</h2>
+      <div class="row2">
+        <div><label>وزن نمونه+استوانه - gr (L16)</label><input type="number" step="any" id="l16"></div>
+        <div><label>وزن استوانه مسی - gr (L17)</label><input type="number" step="any" id="l17"></div>
+      </div>
+      <label>حجم استوانه مسی - Cm3 (L19)</label>
+      <input type="number" step="any" id="l19">
+    </div>
+
+  </form>
+</main>
+
+<div class="submit-bar">
+  <button id="submitBtn" type="button" onclick="submitForm()">ثبت و ساخت اکسل</button>
+</div>
+
+<script>
+// ⚠️ این آدرس را بعد از Deploy کردن Apps Script (فایل Code.gs) این‌جا جای‌گذاری کنید
+// شبیه: https://script.google.com/macros/s/AKfycb.../exec
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMc9HeoV1MrPbp2xca6yqCG6jQt3VQg7e4CYJKM1L57QfE0VEp-cnYJDkexw6QauHH/exec";
+
+// نمایش/مخفی‌کردن بخش‌ها بر اساس چک‌باکس
+const toggles = [
+  ["chk_sieve", "sec_sieve"],
+  ["chk_moisture", "sec_moisture"],
+  ["chk_se", "sec_se"],
+  ["chk_sg", "sec_sg"],
+  ["chk_uw", "sec_uw"],
+  ["chk_voids", "sec_voids"],
+];
+toggles.forEach(([chkId, secId]) => {
+  const chk = document.getElementById(chkId);
+  const sec = document.getElementById(secId);
+  const sync = () => sec.classList.toggle("open", chk.checked);
+  chk.addEventListener("change", sync);
+  sync();
+});
+
+function num(id) {
+  const v = document.getElementById(id).value;
+  return v === "" ? null : parseFloat(v);
+}
+
+function showMsg(text, ok) {
+  const box = document.getElementById("msgBox");
+  box.textContent = text;
+  box.className = "msg " + (ok ? "ok" : "err");
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+async function submitForm() {
+  const btn = document.getElementById("submitBtn");
+
+  const aggregate_type = document.getElementById("aggregate_type").value;
+  const entered_by = document.getElementById("entered_by").value.trim();
+  const sample_date_fa = document.getElementById("sample_date_fa").value.trim();
+
+  if (!aggregate_type || !entered_by || !sample_date_fa) {
+    showMsg("لطفاً نام کارمند، نوع سنگدانه و تاریخ نمونه‌گیری را وارد کنید.", false);
+    return;
+  }
+
+  const payload = {
+    aggregate_type,
+    entered_by,
+    sample_number: document.getElementById("sample_number").value || null,
+    project_name: document.getElementById("project_name").value || null,
+    sample_date_fa,
+    tester_name: document.getElementById("tester_name").value || null,
+  };
+
+  if (document.getElementById("chk_sieve").checked) {
+    payload.sieve_table1 = { c9: num("c9")??0, c10: num("c10")??0, c11: num("c11")??0, c12: num("c12")??0 };
+    payload.sieve_table2 = {
+      c16: num("c16")??0, c17: num("c17")??0, c18: num("c18")??0,
+      c19: num("c19")??0, c20: num("c20")??0, c21: num("c21")??0, c22: num("c22")??0
+    };
+    payload.sieve200 = num("sieve200"); // فعلاً فقط ذخیره می‌شود (نگاه کن به توضیح بالا)
+  }
+  if (document.getElementById("chk_moisture").checked) {
+    payload.moisture = { c26: num("c26")??0, c27: num("c27")??0 };
+  }
+  if (document.getElementById("chk_se").checked) {
+    payload.se = { h10: num("h10")??0, i10: num("i10")??0, h11: num("h11")??0, i11: num("i11")??0 };
+  }
+  if (document.getElementById("chk_sg").checked) {
+    payload.specific_gravity = { l3: num("l3")??0, l4: num("l4")??0, l5: num("l5")??0, l6: num("l6")??0 };
+  }
+  if (document.getElementById("chk_uw").checked) {
+    payload.unit_weight = {
+      h4: num("h4")??0, h5: num("h5")??0, i4: num("i4")??0, i5: num("i5")??0,
+      h7: num("h7")??0, i7: num("i7")??0
+    };
+  }
+  if (document.getElementById("chk_voids").checked) {
+    payload.voids = { l16: num("l16")??0, l17: num("l17")??0, l19: num("l19")??0 };
+  }
+
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("PUT_YOUR") === 0) {
+    showMsg("⚠️ آدرس Apps Script هنوز در کد جای‌گذاری نشده است.", false);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "در حال ثبت...";
+
+  try {
+    // نکتهٔ فنی: Content-Type را عمداً text/plain می‌گذاریم تا مرورگر
+    // درخواست preflight (OPTIONS) نفرستد — چون Apps Script به آن پاسخ نمی‌دهد.
+    // خود Apps Script همچنان محتوا را به‌صورت JSON می‌خواند (JSON.parse).
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.status !== "ok") {
+      throw new Error(data.message || "خطای نامشخص از سمت Google Apps Script");
+    }
+
+    showMsg("✅ آزمایش با موفقیت در Google Drive ثبت شد.", true);
+    document.getElementById("qcForm").reset();
+    toggles.forEach(([chkId, secId]) => {
+      document.getElementById(secId).classList.remove("open");
+    });
+    document.getElementById("chk_sieve").checked = true;
+    document.getElementById("chk_moisture").checked = true;
+    document.getElementById("sec_sieve").classList.add("open");
+    document.getElementById("sec_moisture").classList.add("open");
+
+  } catch (err) {
+    showMsg("❌ خطا: " + err.message, false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "ثبت و ساخت اکسل";
+  }
+}
+</script>
+
+</body>
+</html>
